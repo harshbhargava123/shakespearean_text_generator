@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shakespeare Text Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: auto; }
+        textarea, input { width: 100%; margin-bottom: 10px; }
+        button { padding: 10px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shakespeare Text Generator</h1>
+        <form id="generate-form">
+            <label for="seed_text">Seed Text:</label><br>
+            <textarea id="seed_text" name="seed_text" rows="4" placeholder="Enter seed text (e.g., 'Either you')"></textarea><br>
+            <label for="gen_text_length">Generation Length:</label><br>
+            <input type="number" id="gen_text_length" name="gen_text_length" value="300"><br>
+            <label for="temperature">Temperature (0.1 to 2.0):</label><br>
+            <input type="number" id="temperature" name="temperature" step="0.1" value="1.0"><br>
+            <button type="submit">Generate</button>
+        </form>
+        <h2>Generated Text:</h2>
+        <p id="result"></p>
+    </div>
+    <script>
+        document.getElementById('generate-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                seed_text: document.getElementById('seed_text').value,
+                gen_text_length: parseInt(document.getElementById('gen_text_length').value),
+                temperature: parseFloat(document.getElementById('temperature').value)
+            };
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').innerText = data.generated_text;
+                } else {
+                    document.getElementById('result').innerText = `Error: ${data.detail}`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
